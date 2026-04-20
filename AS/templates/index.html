@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS - Analyzer Statistics</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #0a0a0f;
+            color: #e8e8f0;
+            font-family: 'Courier New', monospace;
+            padding: 40px 24px;
+        }
+        h1 { color: #7c6aff; margin-bottom: 8px; }
+        p.sub { color: #6a6a88; margin-bottom: 32px; }
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #12121a;
+            border: 1px solid #2a2a40;
+            color: #e8e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        input {
+            width: 100%;
+            background: #12121a;
+            border: 1px solid #2a2a40;
+            color: #e8e8f0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        button {
+            background: #7c6aff;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        button:hover { background: #6a58e0; }
+        #status { margin-top: 16px; color: #00e5b4; }
+        #preview {
+            margin-top: 24px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        th {
+            background: #7c6aff;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #2a2a40;
+        }
+        tr:hover { background: #1a1a26; }
+        .downloads {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .downloads a {
+            background: #12121a;
+            border: 1px solid #2a2a40;
+            color: #00e5b4;
+            padding: 8px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .downloads a:hover { border-color: #00e5b4; }
+    </style>
+</head>
+<body>
+    <h1>AS — Analyzer Statistics</h1>
+    <p class="sub">Describe your dataset. AI generates it instantly.</p>
+
+    <textarea id="prompt" placeholder="e.g. Generate 20 rows of Indian student data with name, age, city, marks, pass/fail"></textarea>
+    <input id="filename" placeholder="File name (e.g. students)" />
+    <button onclick="generate()">Generate Dataset</button>
+
+    <div id="status"></div>
+    <div id="preview"></div>
+    <div class="downloads" id="downloads"></div>
+
+    <script>
+        async function generate() {
+            const prompt = document.getElementById("prompt").value;
+            const filename = document.getElementById("filename").value || "dataset";
+            const status = document.getElementById("status");
+            const preview = document.getElementById("preview");
+            const downloads = document.getElementById("downloads");
+
+            if (!prompt) { status.textContent = "Please enter a prompt."; return; }
+
+            status.textContent = "⏳ Generating... please wait";
+            preview.innerHTML = "";
+            downloads.innerHTML = "";
+
+            const res = await fetch("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt, filename })
+            });
+
+            const data = await res.json();
+
+            if (data.error) {
+                status.textContent = "❌ Error: " + data.error;
+                return;
+            }
+
+            status.textContent = "✅ Dataset generated!";
+
+            // Build table
+            let html = "<table><thead><tr>";
+            data.preview.columns.forEach(col => html += `<th>${col}</th>`);
+            html += "</tr></thead><tbody>";
+            data.preview.rows.forEach(row => {
+                html += "<tr>";
+                row.forEach(val => html += `<td>${val}</td>`);
+                html += "</tr>";
+            });
+            html += "</tbody></table>";
+            preview.innerHTML = html;
+
+            // Download links
+            ["csv", "json", "xlsx", "sql", "txt"].forEach(fmt => {
+                const a = document.createElement("a");
+                a.href = `/download/${fmt === "xlsx" ? "xlsx" : fmt}/${filename}`;
+                a.textContent = `⬇ ${fmt.toUpperCase()}`;
+                downloads.appendChild(a);
+            });
+        }
+    </script>
+</body>
+</html>

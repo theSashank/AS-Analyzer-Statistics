@@ -1,0 +1,32 @@
+[
+  {
+    "Student ID":"S001",
+    "Name":"John Smith",
+    "Age":17,
+    "Grade":12
+  },
+  {
+    "Student ID":"S002",
+    "Name":"Emily Chen",
+    "Age":18,
+    "Grade":11
+  },
+  {
+    "Student ID":"S003",
+    "Name":"Michael Brown",
+    "Age":16,
+    "Grade":10
+  },
+  {
+    "Student ID":"S004",
+    "Name":"Sarah Lee",
+    "Age":19,
+    "Grade":13
+  },
+  {
+    "Student ID":"S005",
+    "Name":"David Kim",
+    "Age":17,
+    "Grade":9
+  }
+]

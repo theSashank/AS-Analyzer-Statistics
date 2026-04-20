@@ -1,0 +1,6 @@
+Student ID          Name  Age  Grade
+      S001    John Smith   17     12
+      S002    Emily Chen   18     11
+      S003 Michael Brown   16     10
+      S004     Sarah Lee   19     13
+      S005     David Kim   17      9
